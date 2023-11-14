@@ -1,4 +1,8 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Matrices {
     public static String[][] matriz = {
@@ -110,6 +114,17 @@ public class Matrices {
     };
 
 
+    //Detectar mutantes con expresiones regulares
+    public static boolean mutante(String dna){
+        Pattern pattern = Pattern.compile("(.)\\1{3,}");
+        Matcher matcher = pattern.matcher(dna);
+        if (matcher.find()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static void mostrarMatriz(String[][]matriz, Integer n, Integer n2){
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n2; j++) {
@@ -120,132 +135,70 @@ public class Matrices {
     }
 
     public static boolean analizarMatriz(String[][]matriz, Integer n, Integer n2){
-        String aux = "";
-        int cont = 0;
-        int enfermedades = 0;
-        int contEnfermedades=0;
-        boolean flag = false;
-        int rows = matriz.length;
-        int cols = matriz[0].length;
+        int mutaciones = 0;
+        int filas = matriz.length;
+        int columnas = matriz[0].length;
+
+        String cadena = "";
 
         // Analizar la matriz horizontalmente
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n2; j++) {
-
-                if (!flag){
-                    aux = matriz[i][j];
-                    flag = true;
-                }
-
-                if (matriz[i][j].equals(aux))
-                {
-                    cont ++;
-                }
-                else{
-                    aux = matriz[i][j];
-                    cont=0;
-                }
-
-                if(cont==4){
-                    enfermedades++;
-                    cont=0;
-                }
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                cadena+=matriz[i][j];
             }
-            flag = false;
-            cont=0;
-            contEnfermedades+=enfermedades;
-            enfermedades = 0;
+            if(mutante(cadena)){ //REGEX
+                mutaciones++;
+            }
+            cadena="";
         }
-        aux = "";
 
         // Analizar la matriz verticalmente
-
-        enfermedades = 0;
-        flag = false;
-        for (int j = 0; j < n2;j++) {
-            for (int i = 0; i < n; i++) {
-                if (!flag){
-                    aux = matriz[i][j];
-                    flag = true;
-                }
-
-                if (matriz[i][j].equals(aux))
-                {
-                    cont ++;
-                }
-
-                else{
-                    aux = matriz[i][j];
-                    cont=0;
-                }
-
-                if(cont==4){
-                    enfermedades++;
-                }
+        for (int j = 0; j < columnas;j++) {
+            for (int i = 0; i < filas; i++) {
+                cadena+=matriz[i][j];
             }
-            flag = false;
-            cont=0;
-            contEnfermedades+=enfermedades;
-            enfermedades = 0;
+            if(mutante(cadena)){ //REGEX
+                mutaciones++;
+            }
+            cadena="";
         }
-        aux = "";
 
         // Recorrer todas las diagonales
-
-        for (int k = 0; k <= rows + cols - 2; k++) {
+        //Haciendo esto me quito la limitación de hacer otro for para recorrer las diagonales, ya que sumo ambos índices para que la vuelta no termine en i=6
+        for (int k = 0; k <= filas + columnas - 2; k++) {
             for (int j = 0; j <= k; j++) {
-                int i = k - j;
-                if (i < rows && j < cols) {
-                    if (matriz[i][j].equals(aux)) {
-                        cont++;
-                        if (cont == 4) {
-                            enfermedades++;
-                            cont = 0;  // Reiniciar el contador después de detectar una enfermedad
-                        }
-                    } else {
-                        aux = matriz[i][j];
-                        cont = 1;  // Iniciar el contador para el nuevo carácter
-                    }
+                int i = k - j; //Fórmula para sacar diagonal
+                if (i < filas && j < columnas) {
+                    cadena+=matriz[i][j];
                 }
             }
-            cont=0;
-            contEnfermedades += enfermedades;
-            enfermedades = 0;  // Reiniciar el contador de enfermedades después de cada diagonal
+            if(mutante(cadena)){ //REGEX
+                mutaciones++;
+            }
+            cadena="";
         }
-        aux = "";
 
         // Recorrer todas las diagonales inversas
-
-        for (int k = 0; k <= rows + cols - 2; k++) {
+        //Mismo caso que el anterior
+        for (int k = 0; k <= filas + columnas - 2; k++) {
             for (int j = 0; j <= k; j++) {
-                int i = rows - 1 - (k - j);
-                if (i >= 0 && j < cols) {
-                    if (matriz[i][j].equals(aux)) {
-                        cont++;
-                        if (cont == 4) {
-                            enfermedades++;
-                            cont = 0;  // Reiniciar el contador después de detectar una enfermedad
-                        }
-                    } else {
-                        aux = matriz[i][j];
-                        cont = 1;  // Iniciar el contador para el nuevo carácter
-                    }
+                int i = filas - 1 - (k - j); //Fórmula para sacar diagonal inversa
+                if (i >= 0 && j < columnas) {
+                    cadena+=matriz[i][j];
                 }
             }
-            cont=0;
-            contEnfermedades+=enfermedades;
-            enfermedades=0;
+            if(mutante(cadena)){ //REGEX
+                mutaciones++;
+            }
+            cadena="";
         }
 
-        System.out.println("Enfermedades: "+contEnfermedades);
-        if(contEnfermedades>1){
+        System.out.println("Mutaciones: "+mutaciones);
+        if(mutaciones>1){
             return  true;
         }
         else{
             return  false;
         }
     }
-
-
 }

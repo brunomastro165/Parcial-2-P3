@@ -5,11 +5,9 @@ import java.util.Scanner;
 
 public class Main {
 
-    //Encontrar cadenas de 4 o más letras en todas las direcciones posibles
     public static void main(String[] args) {
-
         //Ponemos acá la matriz para testear
-    enviarMatriz(Matrices.matriz9);
+    enviarMatriz(Matrices.matriz4);
 
     }
 
